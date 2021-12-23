@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/XiaozhouCui/space-finder-backend#readme",
   "devDependencies": {
+    "@types/node": "^17.0.3",
     "aws-cdk": "^2.2.0",
     "aws-cdk-lib": "^2.2.0",
     "constructs": "^10.0.12",
