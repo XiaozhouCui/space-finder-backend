@@ -24,3 +24,13 @@
 - In SpaceStack, initialize the GenericTable class to create a new DynamoDB instance `spacesTable`
 - Run `cdk synth`, should see a `SpacesTable` instance with Type: `AWS::DynamoDB::Table`
 - Run `cdk deploy`, should create `AWS > DynamoDB > Tables > SpacesTable`, with partition key `spaceId`
+
+## Use Lambda with TypeScript (CDK Node Lambda)
+- Install esbuild `npm i -D esbuild@0`
+- Install uuid `npm i uuid @types/uuid`
+- Create a new lambda function in TypeScript `hello.ts`
+- In SpaceStack, `import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'`
+- Initialize the NodejsFunction as ts lambda `helloLambdaNodeJs`
+- Run `cdk synth`, in folder `cdk.out/asset.***` the ts lambda should be compiled as `index.js`, including uuid
+- The compiled file `index.js` is much bigger in size, because it includes the imported dependency `uuid`
+- Run `cdk deploy`, it should create a new lambda `SpaceFinder-helloLambdaNodeJs***`

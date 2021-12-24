@@ -4,6 +4,7 @@ import { Code, Function as LambdaFunction, Runtime } from 'aws-cdk-lib/aws-lambd
 import { join } from 'path';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway'
 import { GenericTable } from './GenericTable';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 
 export class SpaceStack extends Stack {
   // "this" is the context/scope of type Construct
@@ -20,6 +21,11 @@ export class SpaceStack extends Stack {
       code: Code.fromAsset(join(__dirname, '..', 'services', 'hello')),
       // map the handler to the exported "main" property of hello.js
       handler: 'hello.main'
+    })
+
+    const helloLambdaNodeJs = new NodejsFunction(this, 'helloLambdaNodeJs', {
+      entry: (join(__dirname, '..', 'services', 'node-lambda', 'hello.ts')),
+      handler: 'handler' // exported handler property from hello.ts
     })
 
     // integrate lambda with API Gateway
