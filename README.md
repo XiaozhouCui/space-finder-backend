@@ -18,3 +18,9 @@
 - Run `cdk deploy`, after success, the terminal will show outputs, containing the URL endpoint of API gateway
 - In browser, open `https://srqcwkm2nd.execute-api.ap-southeast-2.amazonaws.com/prod/hello` will see the message from lambda
 - In VS-Code, install Rest Client, then add a requests.http file, it can send requests like postman.
+
+## Add DynamoDB
+- Use package `aws-cdk-lib/aws-dynamodb` to create a new class `GenericTable.ts`
+- In SpaceStack, initialize the GenericTable class to create a new DynamoDB instance `spacesTable`
+- Run `cdk synth`, should see a `SpacesTable` instance with Type: `AWS::DynamoDB::Table`
+- Run `cdk deploy`, should create `AWS > DynamoDB > Tables > SpacesTable`, with partition key `spaceId`
