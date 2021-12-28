@@ -41,3 +41,14 @@
 - To list S3 buckets, add S3 using aws-sdk into `hello.ts`
 - To allow lambda to list S3 buckets, add **role policy** to lambda using aws-cdk in `SpaceStack.ts`
 - Redeploy the SpaceStack, then send a request in `requests.http`, the log group should show S3 buckets
+
+## Run and debug lambda on LOCAL MACHINE
+- Make sure admin access is configured in CLI
+- Make sure `ts-node` is installed in package.json
+- In VS Code, go to *Run and Degug* (ctrl + shift + D), create a debug configuration: `.vscode/launch.json`
+- In launch.json, name it `Debug local file`, add runtime as `ts-node/register`, and set AWS_REGION to `ap-southeast-2`
+- If AWS session token is used, add them into the `env` property of `launch.json`
+- Create a test file `Hello.test.ts`, import the handler, call the handler with empty objects as args
+- Now we can put a break point into the lambda, right aafter `const buckets = await s3Client.listBuckets().promise()`
+- Open `Hello.test.ts` in VS Code, click *Run and Degug*, select `Debug local file`, then click `Run`
+- Now the break point will be hit, all the buckets from AWS will be listed on the left hand side
