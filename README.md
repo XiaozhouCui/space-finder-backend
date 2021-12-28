@@ -34,3 +34,10 @@
 - Run `cdk synth`, in folder `cdk.out/asset.***` the ts lambda should be compiled as `index.js`, including uuid
 - The compiled file `index.js` is much bigger in size, because it includes the imported dependency `uuid`
 - Run `cdk deploy`, it should create a new lambda `SpaceFinder-helloLambdaNodeJs***`
+
+## Test and debug lambdas
+- Add some console log in lambda, deploy and then send a request in `requests.http`
+- On AWS console, goto CloudWatch > Log Groups > /aws/lambda/SpaceFinder-helloLambdaNodeJs***, check for logs
+- To list S3 buckets, add S3 using aws-sdk into `hello.ts`
+- To allow lambda to list S3 buckets, add **role policy** to lambda using aws-cdk in `SpaceStack.ts`
+- Redeploy the SpaceStack, then send a request in `requests.http`, the log group should show S3 buckets
