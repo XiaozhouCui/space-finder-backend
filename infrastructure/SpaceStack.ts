@@ -10,7 +10,13 @@ import { PolicyStatement } from 'aws-cdk-lib/aws-iam'
 export class SpaceStack extends Stack {
   // "this" is the context/scope of type Construct
   private api = new RestApi(this, 'SpaceApi')
-  private spacesTable = new GenericTable('SpacesTable', 'spaceId', this)
+
+  // private spacesTable = new GenericTable('SpacesTable', 'spaceId', this)
+  private spacesTable = new GenericTable(this, {
+    tableName: 'SpacesTable',
+    primaryKey: 'spaceId',
+    createLambdaPath: 'Create'
+  })
 
   // app is of type Construct
   constructor(scope: Construct, id: string, props: StackProps) {
@@ -41,5 +47,9 @@ export class SpaceStack extends Stack {
     // provide api gateway as resource
     const helloLambdaResource = this.api.root.addResource('hello')
     helloLambdaResource.addMethod('GET', helloLambdaIntegration)
+
+    // Spaces API integrations:
+    const spaceResource = this.api.root.addResource('spaces')
+    spaceResource.addMethod('POST', this.spacesTable.createLambdaIntegration)
   }
 }

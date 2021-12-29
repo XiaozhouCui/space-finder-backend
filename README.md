@@ -52,3 +52,14 @@
 - Now we can put a break point into the lambda, right aafter `const buckets = await s3Client.listBuckets().promise()`
 - Open `Hello.test.ts` in VS Code, click *Run and Degug*, select `Debug local file`, then click `Run`
 - Now the break point will be hit, all the buckets from AWS will be listed on the left hand side
+
+## Refactor GenericTable.ts
+- Add interface `TableProps` and inject it into constructor as props
+- Run `this.initialize()` in constructor, which will run `createTable` `createLambdas` and `grantTableRights`
+- In `createTable`,  pass in `tableName` and `primaryKey` from `this.props`
+- In `createLambdas`, add 4 lambdas for CRUD operations and integrate them
+- In `grantTableRights`, allow the 4 lambdas to read from or write into DynamoDB table
+- Once refactored, goto SpaceStack.ts, and integrate the `createLambda` with API Gateway
+- In requests.http, add a POST request with payload `location` and `name`
+- Run `cdk synth` to check for errors, then run `cdk deploy` to deploy
+- Send the POST request, a new item with location and name will be created in DynamoDB
