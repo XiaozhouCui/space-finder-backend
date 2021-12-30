@@ -95,3 +95,8 @@
 - Get the request data from `event.body`, get primary key (spaceId) from query string `event.queryStringParameters.spaceId`
 - Locally test the handler in *Update.test.ts*, grab an existing item ID from db
 - Mock spaceId and location in the event arg, run debug, the item with provided spaceId should be updated
+
+## Delete item
+- Create *Delete.ts*, use `dbClient.delete()` to remove the item with provided ID
+- Locally test the handler in *Delete.test.ts*, grab an existing item ID from db
+- Update *SpaceStack.ts* to include update and delete handlers, then deploy the stack
