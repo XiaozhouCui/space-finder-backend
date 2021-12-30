@@ -63,3 +63,9 @@
 - In requests.http, add a POST request with payload `location` and `name`
 - Run `cdk synth` to check for errors, then run `cdk deploy` to deploy
 - Send the POST request, a new item with location and name will be created in DynamoDB
+
+## Scan (get) items from DynamoDB
+- Create a new handler file `Read.ts`, use `dbClient.scan()` to get all items from DynamoDb
+- To test it locally, in `Hello.test.ts`, import handler from `Read.ts`, add a break point in `Read.ts`
+- Add environment variable `TABLE_NAME` into the env property of `launch.json` for local debug
+- Run debug in `Hello.test.ts`
