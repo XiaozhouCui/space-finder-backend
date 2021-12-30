@@ -81,7 +81,7 @@
 - To deploy the read lambda, in *SpaceStack.ts* add `readLambdaPath` and a GET method for `readLambdaIntegration`
 - Run `cdk deploy`, add a GET method with query string in *requests.http*, run the GET method should return the item with privided ID
 
-## Query on secondary indexes (location)
+## Query on secondary indexes (location, name...)
 - To use `location` as a secondary index, add a new TableProps `secondaryIndexes` in *GenericTable.ts*
 - Add a new method `addSecondaryIndexes`, and call it in the `initialize` mothod
 - In *SpaceStack.ts*, initialize the GenericTable with `secondaryIndexes: ['location']`
@@ -89,3 +89,9 @@
 - To debug locally, need to deploy first, because the table config has changed
 - Create a new file *SecondaryIndex.test.ts*, mock query parameter location to be London, add a break point at the end, run debug, the `items` variable should included all items with location equals London
 - In requests.http, add a new GET method with `location=London`, the response should include all items with location equals London
+
+## Update item
+- Create *Update.ts*, use `dbClient.update()` to modify the item
+- Get the request data from `event.body`, get primary key (spaceId) from query string `event.queryStringParameters.spaceId`
+- Locally test the handler in *Update.test.ts*, grab an existing item ID from db
+- Mock spaceId and location in the event arg, run debug, the item with provided spaceId should be updated
