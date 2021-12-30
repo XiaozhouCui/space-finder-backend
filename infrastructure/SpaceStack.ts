@@ -15,7 +15,8 @@ export class SpaceStack extends Stack {
   private spacesTable = new GenericTable(this, {
     tableName: 'SpacesTable',
     primaryKey: 'spaceId',
-    createLambdaPath: 'Create'
+    createLambdaPath: 'Create',
+    readLambdaPath: 'Read'
   })
 
   // app is of type Construct
@@ -44,12 +45,13 @@ export class SpaceStack extends Stack {
 
     // integrate lambda with API Gateway
     const helloLambdaIntegration = new LambdaIntegration(helloLambdaNodeJs)
-    // provide api gateway as resource
+    // provide api gateway as resource: {{endpoint}}/hello/
     const helloLambdaResource = this.api.root.addResource('hello')
     helloLambdaResource.addMethod('GET', helloLambdaIntegration)
 
-    // Spaces API integrations:
+    // Spaces API integrations: {{endpoint}}/spaces/
     const spaceResource = this.api.root.addResource('spaces')
     spaceResource.addMethod('POST', this.spacesTable.createLambdaIntegration)
+    spaceResource.addMethod('GET', this.spacesTable.readLambdaIntegration)
   }
 }

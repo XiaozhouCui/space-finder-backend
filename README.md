@@ -64,8 +64,19 @@
 - Run `cdk synth` to check for errors, then run `cdk deploy` to deploy
 - Send the POST request, a new item with location and name will be created in DynamoDB
 
-## Scan (get) items from DynamoDB
+## Scan method: get all items from DynamoDB
 - Create a new handler file `Read.ts`, use `dbClient.scan()` to get all items from DynamoDb
-- To test it locally, in `Hello.test.ts`, import handler from `Read.ts`, add a break point in `Read.ts`
+- To test it locally, create `Read.test.ts`, import handler from `Read.ts`, add a break point at the end
 - Add environment variable `TABLE_NAME` into the env property of `launch.json` for local debug
-- Run debug in `Hello.test.ts`
+- Run debug in `Read.test.ts`, the items variable should show all the items in DynamoDB
+
+## Query method: search by condition in DynamoDB
+- Use query string parameter as the search condition
+- Search by primary key (spaceId): `{{endpoint}}/spaces?spaceId=6928c6b4-d227-4422-b4c1-89bd4e05782e`
+- Add the new logic in Read.ts, use `dbClient.query()` to search by spaceId
+- To test it locally, create a new item and get the new ID
+- Add `QueryString.test.ts`, mock the event with the new ID as `queryStringParameters`
+- Add environment variable `PRIMARY_KEY` into the env property of `launch.json` for local debug
+- Add a break point in `QueryString.test.ts`, run debug, the items array will show 1 element with the mocked ID
+- To deploy the read lambda, in `SpaceStack.ts` add `readLambdaPath` and a GET method for `readLambdaIntegration`
+- Run `cdk deploy`, add a GET method with query string in `request.http`, run the GET method should return the item with privided ID
