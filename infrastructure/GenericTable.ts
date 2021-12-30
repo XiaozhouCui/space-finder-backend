@@ -8,9 +8,10 @@ export interface TableProps {
   tableName: string;
   primaryKey: string;
   createLambdaPath?: string; // filename ('Create')
-  readLambdaPath?: string;
+  readLambdaPath?: string; // 'Read'
   updateLambdaPath?: string;
   deleteLambdaPath?: string;
+  secondaryIndexes?: string[];
 }
 
 export class GenericTable {
@@ -37,19 +38,35 @@ export class GenericTable {
   // use private methods to organise code in OOP way
   private initialize() {
     this.createTable()
+    this.addSecondaryIndexes()
     this.createLambdas()
     this.grantTableRights()
   }
 
   private createTable() {
     this.table = new Table(this.stack, this.props.tableName, {
-      // partitionKey is primary key
+      // this partitionKey is primary key 'spaceId'
       partitionKey: {
         name: this.props.primaryKey,
         type: AttributeType.STRING // AttributeType is enum
       },
       tableName: this.props.tableName
     })
+  }
+
+  private addSecondaryIndexes() {
+    if (this.props.secondaryIndexes) {
+      for (const secondaryIndex of this.props.secondaryIndexes) {
+        this.table.addGlobalSecondaryIndex({
+          indexName: secondaryIndex,
+          // this partition key is non-primary-key, e.g. location, name...
+          partitionKey: {
+            name: secondaryIndex,
+            type: AttributeType.STRING // AttributeType is enum
+          }
+        })
+      }
+    }
   }
 
   private createLambdas() {
