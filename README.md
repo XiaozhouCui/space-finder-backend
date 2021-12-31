@@ -107,11 +107,11 @@
 - In **Attributes**, allow sign in with email and username
 - Follow default settings in all other steps, then click **Create pool**
 - Once the pool is created, copy the User Pool ID `ap-southeast-2_wM1n73HNa`
-- Go to **App integration** > **Domain name**, add domain prefix `joe-cui`, click **Save changes**
-- Go to **General Settings** > **App clients** > **Add an app client**
+- Go to **App integration > Domain name**, add domain prefix `joe-cui`, click **Save changes**
+- Go to **General Settings > App clients > Add an app client**
 - Name it `my-app-client`, uncheck **Generate client secret**, check all boxes in **Auth Flows Configuration**
 - Click **Create app client**, copy the App Client ID `14n91s6eirhj5b22pgpsi6k99u`
-- Go to **General Settings** > **Users and groups** > **Create user**
+- Go to **General Settings > Users and groups > Create user**
 - Set username, initial password and email, click Create button
 - The initial password is only temporary, need to set it to *permanent* in CLI
 - Go to CLI, enter `aws cognito-idp admin-set-user-password --user-pool-id ap-southeast-2_wM1n73HNa --username joe.cui --password "g98yad0Thj#la5" --permanent`, then the user account status should become *CONFIRMED*
@@ -124,3 +124,15 @@
 - In test file, login with the username and password in *config.ts*
 - In *AuthService.ts*, add a break point before returning the CognitoUser in login method
 - Run debug in *auth.test.ts*, the returned `user` from Cognito should contain JWT `{signInUserSession:{idToken:{jwtToken:'eyJra...'}}}`
+
+## Manually setup ApiGateway Authorizer
+- Go to **API Gateway > SpaceApi > Authorizers**, click **Create new authorizer**
+- Name it `My-test-authorizer`, select Type `Cognito`, enter Cognito User Pool `User-pool-test`
+- In **Token Source**, enter `Authorization` which means authorization header of HTTP request
+- Click **Create** button, copy Authorizer ID: `yb2rr0`
+- Go to **API Gateway > SpaceApi > Resources**, select **/hello > GET > Method Request**
+- In **Settings > Authorization**, select `My-test-authorizer`
+- Once updated, need to redeploy API. Click **Actions** button and select **Deploy API**, select `prod` stage and click **Deploy**
+- Once redeployed, the request `GET {{endpoint}}/hello/` (without token) should return 401 "Unauthorized"
+- To test the JWT auth, run debug in *auth.test.ts*, brab the `jwtToken` and use it in *requests.http*
+- Add `Authorization: {{token}}` after `GET {{endpoint}}/hello/`, make the request, it should return 200 with data payload
