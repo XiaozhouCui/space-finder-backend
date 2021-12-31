@@ -100,3 +100,18 @@
 - Create *Delete.ts*, use `dbClient.delete()` to remove the item with provided ID
 - Locally test the handler in *Delete.test.ts*, grab an existing item ID from db
 - Update *SpaceStack.ts* to include update and delete handlers, then deploy the stack
+
+## Cognito
+- Go to AWS console > Cognito, select **Manage user pools**
+- Create a new user pool *User-pool-test*
+- In **Attributes**, allow sign in with email and username
+- Follow default settings in all other steps, then click **Create pool**
+- Once the pool is created, copy the User Pool ID `ap-southeast-2_wM1n73HNa`
+- Go to **App integration** > **Domain name**, add domain prefix `joe-cui`, click **Save changes**
+- Go to **General Settings** > **App clients** > **Add an app client**
+- Name it `my-app-client`, uncheck **Generate client secret**, check all boxes in **Auth Flows Configuration**
+- Click **Create app client**, copy the App Client ID `14n91s6eirhj5b22pgpsi6k99u`
+- Go to **General Settings** > **Users and groups** > **Create user**
+- Set username, initial password (`g98yad0Thj#la5`) and email, click Create button
+- The initial password is only temporary, need to set it to *permanent* in CLI
+- Go to CLI, enter `aws cognito-idp admin-set-user-password --user-pool-id ap-southeast-2_wM1n73HNa --username joe.cui --password "g98yad0Thj#la5" --permanent`, then the user account status should become *CONFIRMED*
