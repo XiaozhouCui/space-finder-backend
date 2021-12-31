@@ -3,6 +3,6 @@
 export interface Space {
   spaceId: string;
   name: string;
-  locatin: string;
+  location: string;
   photoUrl?: string;
 }

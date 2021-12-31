@@ -4,7 +4,8 @@ import { handler } from '../../services/SpacesTable/Create'
 // Get data from ApiGateway
 const event = {
   body: {
-    name: "someName"
+    name: "someName",
+    location: "someLocation"
   }
 } as any
 
