@@ -149,3 +149,14 @@
 - Once created, use CLI to update account status, with the new `UserPoolId`, then the account *joe.cui.2* should become *CONFIRMED*
 - Open *auth.test.ts*, run debug, copy jwtToken, paste it into *requests.http*, send request to `GET {{endpoint}}/hello/`, should receive 200 response
 - Go to **AWS > API Gateway > SpaceApi > Resources > /hello > GET**, Method Request should have `Auth: SpaceUserAuthorizer`
+
+## Add admin user group
+- In *AuthorizerWrapper.ts* add a new method `createAdminsGroup`
+- In *hello.ts*, update the lambda to return stringified event
+- Run `cdk deploy`, go to **AWS > Cognito > Manage User Pools > Users and groups > Groups**, we should see `admins` group
+- Select *joe.cui.2*, click **Add to group**, then select `admins`. Now the user has been added to the admins group
+- Open *requests.http*, send request to `GET {{endpoint}}/hello/`, should see the whole lambda event (APIGatewayProxyEvent)
+- In response, in `event.requestContext.authorizer.claims`, there should be `"cognito:groups": "admins"`
+- Update *hello.ts* to check for `cognito:groups` for authorization, then run `cdk deploy`
+- Send request to `GET {{endpoint}}/hello/`, should see 200 response
+- Remove user from `admins` group on AWS, get a new JWT, then send request with new token, should see 401 response

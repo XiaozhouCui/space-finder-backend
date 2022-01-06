@@ -1,17 +1,24 @@
-import { v4 } from "uuid";
-import { S3 } from 'aws-sdk'
+import { APIGatewayProxyEvent } from 'aws-lambda'
 
-const s3Client = new S3()
-
-async function handler (event: any, context: any) {
-  // to list buckets, need to add role policy to Lambda
-  const buckets = await s3Client.listBuckets().promise()
-  console.log('Got an event:')
-  console.log(event)
-  return {
-    statusCode: 200,
-    body: 'Here are your buckets: ' + JSON.stringify(buckets)
+async function handler (event: APIGatewayProxyEvent, context: any) {
+  if (isAuthorized(event)) {
+    return {
+      statusCode: 200,
+      body: JSON.stringify('You are authorized')
+    }
   }
+  return {
+    statusCode: 401,
+    body: JSON.stringify('You are NOT authorized')
+  }
+}
+
+function isAuthorized(event: APIGatewayProxyEvent) {
+  const groups = event.requestContext.authorizer?.claims['cognito:groups']
+  if (groups) {
+    return (groups as string).includes('admins')
+  }
+  return false
 }
 
 export { handler }

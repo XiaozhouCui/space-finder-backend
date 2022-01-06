@@ -1,6 +1,6 @@
 import { CfnOutput } from "aws-cdk-lib";
 import { CognitoUserPoolsAuthorizer, RestApi } from "aws-cdk-lib/aws-apigateway";
-import { UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
+import { UserPool, UserPoolClient, CfnUserPoolGroup } from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
 
 export class AuthorizerWrapper {
@@ -23,8 +23,10 @@ export class AuthorizerWrapper {
     this.createUserPool()
     this.addUserPoolClient()
     this.createAuthorizer()
+    this.createAdminsGroup()
   }
 
+  // create Cognito user pool
   private createUserPool() {
     this.userPool = new UserPool(this.scope, 'SpaceUserPool', {
       // user pool name is the same as user pool ID
@@ -43,6 +45,7 @@ export class AuthorizerWrapper {
     })
   }
 
+  // client for Amplify
   private addUserPoolClient() {
     this.userPoolClient = this.userPool.addClient('SpaceUserPool-client', {
       // client name is the same as client ID
@@ -62,13 +65,14 @@ export class AuthorizerWrapper {
     })
   }
 
+  // add authorizer to the passed-in API arg
   private createAuthorizer() {
     this.authorizer = new CognitoUserPoolsAuthorizer(this.scope, 'SpaceUserAuthorizer', {
       cognitoUserPools: [this.userPool],
       authorizerName: 'SpaceUserAuthorizer',
       identitySource: 'method.request.header.Authorization',
     })
-    // this authorizer must be attached to an API
+    // an authorizer must be attached to an API
     this.authorizer._attachToApi(this.api);
 
     // alternative way of creating authorizer: CfnAuthorizer from "aws-cdk-lib/aws-apigateway"
@@ -77,5 +81,13 @@ export class AuthorizerWrapper {
     //   type: '',
     //   restApiId: ''
     // })
+  }
+
+  // add a user group 'admins'
+  private createAdminsGroup() {
+    new CfnUserPoolGroup(this.scope, 'admins', {
+      groupName: 'admins',
+      userPoolId: this.userPool.userPoolId
+    })
   }
 }

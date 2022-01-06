@@ -37,6 +37,7 @@ export class SpaceStack extends Stack {
     //   handler: 'hello.main'
     // })
 
+    // AuthorizerWrapper will bind authorizer with ApiGateway
     this.authorizer = new AuthorizerWrapper(this, this.api)
 
     // "this" is the context/scope of type Construct
