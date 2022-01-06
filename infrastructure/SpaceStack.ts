@@ -5,11 +5,13 @@ import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway'
 import { GenericTable } from './GenericTable';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam'
+import { AuthorizerWrapper } from './auth/AuthorizorWrapper'
 // import { Code, Function as LambdaFunction, Runtime } from 'aws-cdk-lib/aws-lambda';
 
 export class SpaceStack extends Stack {
   // "this" is the context/scope of type Construct
   private api = new RestApi(this, 'SpaceApi')
+  private authorizer: AuthorizerWrapper
 
   // private spacesTable = new GenericTable('SpacesTable', 'spaceId', this)
   private spacesTable = new GenericTable(this, {
@@ -34,6 +36,8 @@ export class SpaceStack extends Stack {
     //   // map the handler to the exported "main" property of hello.js
     //   handler: 'hello.main'
     // })
+
+    this.authorizer = new AuthorizerWrapper(this, this.api)
 
     // "this" is the context/scope of type Construct
     const helloLambdaNodeJs = new NodejsFunction(this, 'helloLambdaNodeJs', {

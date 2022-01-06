@@ -136,3 +136,9 @@
 - Once redeployed, the request `GET {{endpoint}}/hello/` (without token) should return 401 "Unauthorized"
 - To test the JWT auth, run debug in *auth.test.ts*, brab the `jwtToken` and use it in *requests.http*
 - Add `Authorization: {{token}}` after `GET {{endpoint}}/hello/`, make the request, it should return 200 with data payload
+
+## Setup Cognito infrastructure using CDK
+- In folder *infrastructure > auth*, create a new file *AuthorizorWrapper.ts*
+- Write the logic to create Cognito user pool and connect to ApiGateway
+- Include `AuthorizorWrapper` in *SpaceStack.ts*, run `cdk synth` to check for errors
+- 
