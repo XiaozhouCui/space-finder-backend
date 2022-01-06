@@ -1,11 +1,11 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { join } from 'path';
-import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway'
+import { AuthorizationType, LambdaIntegration, MethodOptions, RestApi } from 'aws-cdk-lib/aws-apigateway'
 import { GenericTable } from './GenericTable';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam'
-import { AuthorizerWrapper } from './auth/AuthorizorWrapper'
+import { AuthorizerWrapper } from './auth/AuthorizerWrapper'
 // import { Code, Function as LambdaFunction, Runtime } from 'aws-cdk-lib/aws-lambda';
 
 export class SpaceStack extends Stack {
@@ -50,11 +50,20 @@ export class SpaceStack extends Stack {
     s3ListPolicy.addResources('*')
     helloLambdaNodeJs.addToRolePolicy(s3ListPolicy)
 
+    // specify an authorizer
+    const optionsWithAuthorizer: MethodOptions = {
+      authorizationType: AuthorizationType.COGNITO,
+      authorizer: {
+        authorizerId: this.authorizer.authorizer.authorizerId
+      }
+    }
+
     // integrate lambda with API Gateway
     const helloLambdaIntegration = new LambdaIntegration(helloLambdaNodeJs)
     // provide api gateway as resource: {{endpoint}}/hello/
     const helloLambdaResource = this.api.root.addResource('hello')
-    helloLambdaResource.addMethod('GET', helloLambdaIntegration)
+    // add authorizer as option of GET method
+    helloLambdaResource.addMethod('GET', helloLambdaIntegration, optionsWithAuthorizer)
 
     // Spaces API integrations: {{endpoint}}/spaces/
     const spaceResource = this.api.root.addResource('spaces')

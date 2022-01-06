@@ -138,7 +138,14 @@
 - Add `Authorization: {{token}}` after `GET {{endpoint}}/hello/`, make the request, it should return 200 with data payload
 
 ## Setup Cognito infrastructure using CDK
-- In folder *infrastructure > auth*, create a new file *AuthorizorWrapper.ts*
-- Write the logic to create Cognito user pool and connect to ApiGateway
-- Include `AuthorizorWrapper` in *SpaceStack.ts*, run `cdk synth` to check for errors
-- 
+- In folder *infrastructure > auth*, create a new file *AuthorizerWrapper.ts*
+- Write the logic to create Cognito user pool, user pool client, authorizer, and attach authorizer to API
+- Include `AuthorizerWrapper` in *SpaceStack.ts*, add authorizer to the GET method of `helloLambdaResource` as options
+- Run `cdk synth` to check for errors, then run `cdk deploy`
+- Once deployed, the terminal will show `UserPoolClientId = 2vlc9u75nen5sr9q4qhrqr6url` and `UserPoolId = ap-southeast-2_NX7tExP4e`, thanks to the `CfnOutput` in *AuthorizerWrapper.ts*
+- Grab `UserPoolId` and `UserPoolClientId` from terminal, update the values in *config.ts*, which were created manually before
+- To test it, need to create a new user. Go to **AWS > Cognito > Manage User Pools**, we should see the **SpaceUserPool** button
+- Click **SpaceUserPool**, create a new user *joe.cui.2*, with the same password as before, update the user name in *config.ts*
+- Once created, use CLI to update account status, with the new `UserPoolId`, then the account *joe.cui.2* should become *CONFIRMED*
+- Open *auth.test.ts*, run debug, copy jwtToken, paste it into *requests.http*, send request to `GET {{endpoint}}/hello/`, should receive 200 response
+- Go to **AWS > API Gateway > SpaceApi > Resources > /hello > GET**, Method Request should have `Auth: SpaceUserAuthorizer`
