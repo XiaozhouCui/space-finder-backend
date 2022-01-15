@@ -166,5 +166,6 @@
 - Go to **AWS > Cognito > Manage Identity Pools > Create New Identity Pool**
 - Name it *my-test-identity-pool*, tick box **Enable access to unauthenticated identities** and **Allow Basic (Classic) Flow**
 - In Authentication providers, select **Cognito** tab, enter User Pool ID and App client ID, click **Create** button
-- In IAM roles page, click **Allow** button, then will get the Identity Pool ID: *ap-southeast-2:fa9b94db-29da-4fe8-9e3f-92901b367f11*
+- In IAM roles page, click **Allow** button, then will get the Identity Pool ID, save it into *config.ts*
 - Go to **Dashboard > Edit Identity Pool > Authentication Providers > Cognito**, change *Use default role* to *Choose role from token*, click **Save Changes** button
+- To test it locally, add `getAWSTemporaryCreds` in *AuthService.ts*, call it in *auth.test.ts*, run debug, call the aws-sdk `AWS.config.credentials` should return *accessKeyId* and *sessionToken*
