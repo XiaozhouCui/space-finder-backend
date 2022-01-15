@@ -160,3 +160,11 @@
 - Update *hello.ts* to check for `cognito:groups` for authorization, then run `cdk deploy`
 - Send request to `GET {{endpoint}}/hello/`, should see 200 response
 - Remove user from `admins` group on AWS, get a new JWT, then send request with new token, should see 401 response
+
+## Manually setup Cognito Identity Pools from console
+- Cognito Identity Pools will allow users to assume IAM roles, to access other AWS services (e.g. S3)
+- Go to **AWS > Cognito > Manage Identity Pools > Create New Identity Pool**
+- Name it *my-test-identity-pool*, tick box **Enable access to unauthenticated identities** and **Allow Basic (Classic) Flow**
+- In Authentication providers, select **Cognito** tab, enter User Pool ID and App client ID, click **Create** button
+- In IAM roles page, click **Allow** button, then will get the Identity Pool ID: *ap-southeast-2:fa9b94db-29da-4fe8-9e3f-92901b367f11*
+- Go to **Dashboard > Edit Identity Pool > Authentication Providers > Cognito**, change *Use default role* to *Choose role from token*, click **Save Changes** button
