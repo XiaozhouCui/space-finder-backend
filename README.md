@@ -173,4 +173,4 @@
 ## Setup Identity Pool from CDK
 - Create a new class *IdentityPoolWrapper.ts*, pass in the created `UserPool` and `UserPoolClient` in constructor
 - In class, create a method `initializeIdentityPool`, to auto create identity pool from CDK
-- 
+- To create new IAM roles, add method `initializeRoles`, need to get the the args from **AWS > IAM > Roles > Cognito_mytestidentitypoolAuth_Role > Trust relationship tab**
