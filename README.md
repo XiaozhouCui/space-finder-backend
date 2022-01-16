@@ -169,3 +169,8 @@
 - In IAM roles page, click **Allow** button, then will get the Identity Pool ID, save it into *config.ts*
 - Go to **Dashboard > Edit Identity Pool > Authentication Providers > Cognito**, change *Use default role* to *Choose role from token*, click **Save Changes** button
 - To test it locally, add `getAWSTemporaryCreds` in *AuthService.ts*, call it in *auth.test.ts*, run debug, call the aws-sdk `AWS.config.credentials` should return *accessKeyId* and *sessionToken*
+
+## Setup Identity Pool from CDK
+- Create a new class *IdentityPoolWrapper.ts*, pass in the created `UserPool` and `UserPoolClient` in constructor
+- In class, create a method `initializeIdentityPool`, to auto create identity pool from CDK
+- 
