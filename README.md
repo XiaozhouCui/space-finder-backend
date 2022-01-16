@@ -162,13 +162,13 @@
 - Remove user from `admins` group on AWS, get a new JWT, then send request with new token, should see 401 response
 
 ## Manually setup Cognito Identity Pools from console
-- Cognito Identity Pools will allow users to assume IAM roles, to access other AWS services (e.g. S3)
+- Cognito Identity Pools will allow users to assume IAM roles from token, to access other AWS services (e.g. S3)
 - Go to **AWS > Cognito > Manage Identity Pools > Create New Identity Pool**
 - Name it *my-test-identity-pool*, tick box **Enable access to unauthenticated identities** and **Allow Basic (Classic) Flow**
 - In Authentication providers, select **Cognito** tab, enter User Pool ID and App client ID, click **Create** button
 - In IAM roles page, click **Allow** button, then will get the Identity Pool ID, save it into *config.ts*
 - Go to **Dashboard > Edit Identity Pool > Authentication Providers > Cognito**, change *Use default role* to *Choose role from token*, click **Save Changes** button
-- To test it locally, add `getAWSTemporaryCreds` in *AuthService.ts*, call it in *auth.test.ts*, run debug, call the aws-sdk `AWS.config.credentials` should return *accessKeyId* and *sessionToken*
+- To test it locally, add new method `getAWSTemporaryCreds` in *AuthService.ts*, call this method in *auth.test.ts*, run debug, call to the aws-sdk `AWS.config.credentials` should return *accessKeyId* and *sessionToken*
 
 ## Setup Identity Pool from CDK
 - Create a new class *IdentityPoolWrapper.ts*, pass in the created `UserPool` and `UserPoolClient` in constructor
@@ -176,3 +176,6 @@
 - To add new IAM roles, create a method `initializeRoles`, need to get the the args from **AWS > IAM > Roles > Cognito_mytestidentitypoolAuth_Role > Trust relationship tab**
 - Once the roles are added, attach the roles to the identity pool in *AuthorizerWrapper.ts*, by adding a new method `initializeIdentityPoolWrapper`
 - Run `cdk deploy`, **SpaceFinderIdentityPool** should be created
+- Copy the *Space-finder.IdentityPoolId* from terminal after deploy, copy it to replace the `IDENTITY_POOL_ID` in *config.ts*
+- To test it locally, update *auth.test.ts* and run debug, `getBuckets()` should throw error *accessDenied*
+- Manually add user *joe.cui.2* to Group *admins* in AWS console, run debug again, it should return buckets list
