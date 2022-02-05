@@ -40,23 +40,13 @@ export class SpaceStack extends Stack {
     //   handler: 'hello.main'
     // })
 
-    // AuthorizerWrapper will bind authorizer with ApiGateway
-    this.authorizer = new AuthorizerWrapper(this, this.api)
-
     // initialize S3 bucket with suffix from stack ID
     this.initializeSuffix()
     this.initializeSpacesPhotosBucket()
 
-    // "this" is the context/scope of type Construct
-    const helloLambdaNodeJs = new NodejsFunction(this, 'helloLambdaNodeJs', {
-      entry: (join(__dirname, '..', 'services', 'node-lambda', 'hello.ts')),
-      handler: 'handler' // exported handler property from hello.ts
-    })
-    // add role policy to the lambda, so that it can list S3 buckets
-    const s3ListPolicy = new PolicyStatement()
-    s3ListPolicy.addActions('s3:ListAllMyBuckets')
-    s3ListPolicy.addResources('*')
-    helloLambdaNodeJs.addToRolePolicy(s3ListPolicy)
+    // AuthorizerWrapper will bind authorizer with ApiGateway, 
+    // AuthorizerWrapper also passes bucket arn to Identity Pool and then add to admin role
+    this.authorizer = new AuthorizerWrapper(this, this.api, this.spacesPhotosBucket.bucketArn + '/*')
 
     // specify an authorizer
     const optionsWithAuthorizer: MethodOptions = {
@@ -66,12 +56,25 @@ export class SpaceStack extends Stack {
       }
     }
 
-    // integrate lambda with API Gateway
-    const helloLambdaIntegration = new LambdaIntegration(helloLambdaNodeJs)
-    // provide api gateway as resource: {{endpoint}}/hello/
-    const helloLambdaResource = this.api.root.addResource('hello')
-    // add authorizer as option of GET method
-    helloLambdaResource.addMethod('GET', helloLambdaIntegration, optionsWithAuthorizer)
+    // demo for lambda and policy
+    // // "this" is the context/scope of type Construct
+    // const helloLambdaNodeJs = new NodejsFunction(this, 'helloLambdaNodeJs', {
+    //   entry: (join(__dirname, '..', 'services', 'node-lambda', 'hello.ts')),
+    //   handler: 'handler' // exported handler property from hello.ts
+    // })
+    // // add role policy to the lambda, so that it can list S3 buckets
+    // const s3ListPolicy = new PolicyStatement()
+    // s3ListPolicy.addActions('s3:ListAllMyBuckets')
+    // s3ListPolicy.addResources('*')
+    // helloLambdaNodeJs.addToRolePolicy(s3ListPolicy)
+
+    // demo for lambda and API integration
+    // // integrate lambda with API Gateway
+    // const helloLambdaIntegration = new LambdaIntegration(helloLambdaNodeJs)
+    // // provide api gateway as resource: {{endpoint}}/hello/
+    // const helloLambdaResource = this.api.root.addResource('hello')
+    // // add authorizer as option of GET method
+    // helloLambdaResource.addMethod('GET', helloLambdaIntegration, optionsWithAuthorizer)
 
     // Spaces API integrations: {{endpoint}}/spaces/
     const spaceResource = this.api.root.addResource('spaces')
