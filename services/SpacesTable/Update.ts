@@ -1,6 +1,6 @@
 import { DynamoDB } from 'aws-sdk'
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda'
-import { getEventBody } from '../Shared/Utils'
+import { addCorsHeader, getEventBody } from '../Shared/Utils'
 
 const TABLE_NAME = process.env.TABLE_NAME as string
 const PRIMARY_KEY = process.env.PRIMARY_KEY as string
@@ -13,6 +13,8 @@ async function handler(event: APIGatewayProxyEvent, context: Context): Promise<A
     statusCode: 200,
     body: 'Hello from DynamoDB.'
   }
+  // add CORS header to the lambda result
+  addCorsHeader(result)
 
   try {
     // requestBody: { location: 'new location' }

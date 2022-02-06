@@ -1,7 +1,7 @@
 import { DynamoDB } from 'aws-sdk'
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda'
 import { MissingFieldError, validateAsSpaceEntry } from '../Shared/InputValidator'
-import { generateRandomId, getEventBody } from '../Shared/Utils'
+import { generateRandomId, getEventBody, addCorsHeader } from '../Shared/Utils'
 
 // removed uuid because we don't want to compile the entire package into lambda
 // import { v4 } from 'uuid'
@@ -16,6 +16,8 @@ async function handler(event: APIGatewayProxyEvent, context: Context): Promise<A
     statusCode: 200,
     body: 'Hello from DynamoDB.'
   }
+  // add CORS header to the lambda result
+  addCorsHeader(result)
 
   try {
     // get data from ApiGateway event
@@ -27,7 +29,9 @@ async function handler(event: APIGatewayProxyEvent, context: Context): Promise<A
       TableName: TABLE_NAME!,
       Item: item
     }).promise()
-    result.body = JSON.stringify(`Created item with id: ${item.spaceId}`)
+    result.body = JSON.stringify({
+      id: item.spaceId
+    })
   } catch (error: any) {
     if (error instanceof MissingFieldError) {
       result.statusCode = 400
