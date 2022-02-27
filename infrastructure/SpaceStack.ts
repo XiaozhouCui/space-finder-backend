@@ -7,6 +7,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam'
 import { AuthorizerWrapper } from './auth/AuthorizerWrapper'
 import { Bucket, HttpMethods } from 'aws-cdk-lib/aws-s3';
+import { WebAppDeployment } from './WebAppDeployment';
 // import { Code, Function as LambdaFunction, Runtime } from 'aws-cdk-lib/aws-lambda';
 
 export class SpaceStack extends Stack {
@@ -47,6 +48,8 @@ export class SpaceStack extends Stack {
     // AuthorizerWrapper will bind authorizer with ApiGateway, 
     // AuthorizerWrapper also passes bucket arn to Identity Pool and then add to admin role
     this.authorizer = new AuthorizerWrapper(this, this.api, this.spacesPhotosBucket.bucketArn + '/*')
+
+    new WebAppDeployment(this, this.suffix)
 
     // specify an authorizer
     const optionsWithAuthorizer: MethodOptions = {
