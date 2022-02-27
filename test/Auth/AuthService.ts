@@ -16,6 +16,7 @@ Amplify.configure({
   }
 })
 
+// this AuthService class is used to simulate frontend API call, when React app is no ready
 export class AuthService {
   // login locally with Amplify, will return a Cognito user
   public async login(userName: string, password: string) {
@@ -23,6 +24,7 @@ export class AuthService {
     return user // add break point in this line to locally test/debug login in auth.test.ts
   }
 
+  // these methods below will be copied to Frontend app
   public async getAWSTemporaryCreds(user: CognitoUser) {
     // Initialize the Amazon Cognito credentials provider
     const cognitoIdentityPool = `cognito-idp.${config.REGION}.amazonaws.com/${config.USER_POOL_ID}`
