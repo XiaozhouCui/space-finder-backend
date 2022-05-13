@@ -1,12 +1,12 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda"
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 export function generateRandomId(): string {
   // slice(2) will remove the first 2 characters: '0.'
-  return Math.random().toString(36).slice(2)
+  return Math.random().toString(36).slice(2);
 }
 
 export function getEventBody(event: APIGatewayProxyEvent) {
-  return typeof event.body == 'object' ? event.body : JSON.parse(event.body)
+  return typeof event.body == 'object' ? event.body : JSON.parse(event.body);
 }
 
 // setup CORS for lambda
@@ -15,5 +15,14 @@ export function addCorsHeader(result: APIGatewayProxyResult) {
     'Content-type': 'application/json',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': '*',
+  };
+}
+
+export function isIncludedInGroup(group: string, event: APIGatewayProxyEvent) {
+  const groups = event.requestContext.authorizer?.claims['cognito:groups'];
+  if (groups) {
+    return (groups as string).includes(group);
+  } else {
+    return false;
   }
 }
