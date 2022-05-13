@@ -1,7 +1,7 @@
 import { CfnOutput, Fn, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { join } from 'path';
-import { AuthorizationType, LambdaIntegration, MethodOptions, RestApi } from 'aws-cdk-lib/aws-apigateway'
+import { AuthorizationType, LambdaIntegration, Cors, MethodOptions, RestApi, ResourceOptions } from 'aws-cdk-lib/aws-apigateway'
 import { GenericTable } from './GenericTable';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam'
@@ -26,6 +26,16 @@ export class SpaceStack extends Stack {
     updateLambdaPath: 'Update',
     deleteLambdaPath: 'Delete',
     secondaryIndexes: ['location'],
+  })
+
+  private reservationsTable = new GenericTable(this, {
+    tableName: 'ReservationsTable',
+    primaryKey: 'reservationId',
+    createLambdaPath: 'Create',
+    readLambdaPath: 'Read',
+    updateLambdaPath: 'Update',
+    deleteLambdaPath: 'Delete',
+    secondaryIndexes: ['user']
   })
 
   // app is of type Construct
@@ -59,6 +69,13 @@ export class SpaceStack extends Stack {
       }
     }
 
+    const optionsWithCors:ResourceOptions = {
+      defaultCorsPreflightOptions : {
+        allowOrigins: Cors.ALL_ORIGINS,
+        allowMethods: Cors.ALL_METHODS
+      }
+    }
+
     // demo for lambda and policy
     // // "this" is the context/scope of type Construct
     // const helloLambdaNodeJs = new NodejsFunction(this, 'helloLambdaNodeJs', {
@@ -80,11 +97,18 @@ export class SpaceStack extends Stack {
     // helloLambdaResource.addMethod('GET', helloLambdaIntegration, optionsWithAuthorizer)
 
     // Spaces API integrations: {{endpoint}}/spaces/
-    const spaceResource = this.api.root.addResource('spaces')
-    spaceResource.addMethod('POST', this.spacesTable.createLambdaIntegration)
-    spaceResource.addMethod('GET', this.spacesTable.readLambdaIntegration)
-    spaceResource.addMethod('PUT', this.spacesTable.updateLambdaIntegration)
-    spaceResource.addMethod('DELETE', this.spacesTable.deleteLambdaIntegration)
+    const spaceResource = this.api.root.addResource('spaces', optionsWithCors)
+    spaceResource.addMethod('POST', this.spacesTable.createLambdaIntegration, optionsWithAuthorizer)
+    spaceResource.addMethod('GET', this.spacesTable.readLambdaIntegration, optionsWithAuthorizer)
+    spaceResource.addMethod('PUT', this.spacesTable.updateLambdaIntegration, optionsWithAuthorizer)
+    spaceResource.addMethod('DELETE', this.spacesTable.deleteLambdaIntegration, optionsWithAuthorizer)
+
+    // Reservations API integrations: {{endpoint}}/reservations/
+    const reservationResource = this.api.root.addResource('reservations', optionsWithCors);
+    reservationResource.addMethod('POST', this.reservationsTable.createLambdaIntegration, optionsWithAuthorizer);
+    reservationResource.addMethod('GET', this.reservationsTable.readLambdaIntegration, optionsWithAuthorizer);
+    reservationResource.addMethod('PUT', this.reservationsTable.updateLambdaIntegration, optionsWithAuthorizer);
+    reservationResource.addMethod('DELETE', this.reservationsTable.deleteLambdaIntegration, optionsWithAuthorizer);
   }
 
   private initializeSuffix() {
