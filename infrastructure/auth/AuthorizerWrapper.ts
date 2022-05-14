@@ -1,4 +1,4 @@
-import { CfnOutput } from "aws-cdk-lib";
+import { CfnOutput, Duration } from "aws-cdk-lib";
 import {
   CognitoUserPoolsAuthorizer,
   RestApi,
@@ -6,6 +6,7 @@ import {
 import {
   UserPool,
   UserPoolClient,
+  UserPoolEmail,
   CfnUserPoolGroup,
 } from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
@@ -50,6 +51,14 @@ export class AuthorizerWrapper {
       signInAliases: {
         username: true,
         email: true,
+      },
+      passwordPolicy: {
+        minLength: 6,
+        requireLowercase: false,
+        requireUppercase: false,
+        requireDigits: false,
+        requireSymbols: false,
+        tempPasswordValidity: Duration.days(3),
       },
     });
     // need user pool ID, e.g. 'ap-southeast-2_wM1n73HNa'
