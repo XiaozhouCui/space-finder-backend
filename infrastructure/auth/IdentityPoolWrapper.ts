@@ -12,13 +12,14 @@ import {
   Role,
 } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
+import { Policies } from "../Policies";
 
 export class IdentityPoolWrapper {
   private scope: Construct;
   // Cognito user pool
   private userPool: UserPool;
   private userPoolClient: UserPoolClient;
-  private photoBucketArn: string;
+  private policies: Policies;
   // Cognito identity pool
   private identityPool: CfnIdentityPool;
   // IAM roles
@@ -30,12 +31,12 @@ export class IdentityPoolWrapper {
     scope: Construct,
     userPool: UserPool,
     userPoolClient: UserPoolClient,
-    photoBucketArn: string
+    policies: Policies
   ) {
     this.scope = scope;
     this.userPool = userPool;
     this.userPoolClient = userPoolClient;
-    this.photoBucketArn = photoBucketArn;
+    this.policies = policies
     this.initialize();
   }
 
@@ -88,6 +89,8 @@ export class IdentityPoolWrapper {
       }
     );
 
+    this.authenticatedRole.addToPolicy(this.policies.uploadProfilePhoto);
+
     this.unAuthenticatedRole = new Role(
       this.scope,
       "CognitoDefaultUnAuthenticatedRole",
@@ -123,18 +126,21 @@ export class IdentityPoolWrapper {
       ),
     });
 
-    // allow admin to list s3 buckets
-    this.adminRole.addToPolicy(
-      new PolicyStatement({
-        effect: Effect.ALLOW,
-        actions: [
-          // "s3:ListAllMyBuckets"
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-        ],
-        resources: [this.photoBucketArn],
-      })
-    );
+    // allow admin to access s3 buckets
+    this.adminRole.addToPolicy(this.policies.uploadSpacePhotos);
+    this.adminRole.addToPolicy(this.policies.uploadProfilePhoto);
+
+    // // The following policy is moved into Policies class and injected as dependency
+    // this.adminRole.addToPolicy(
+    //   new PolicyStatement({
+    //     effect: Effect.ALLOW,
+    //     actions: [
+    //       "s3:PutObject",
+    //       "s3:PutObjectAcl",
+    //     ],
+    //     resources: [this.photoBucketArn],
+    //   })
+    // );
   }
 
   private attachRoles() {

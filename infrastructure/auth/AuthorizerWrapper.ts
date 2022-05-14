@@ -9,12 +9,13 @@ import {
   CfnUserPoolGroup,
 } from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
+import { Policies } from "../Policies";
 import { IdentityPoolWrapper } from "./IdentityPoolWrapper";
 
 export class AuthorizerWrapper {
   private scope: Construct;
   private api: RestApi;
-  private photoBucketArn: string;
+  private policies: Policies;
 
   // Cognito properties
   private userPool: UserPool;
@@ -24,10 +25,10 @@ export class AuthorizerWrapper {
   // identity pool wrapper
   private identityPoolWrapper: IdentityPoolWrapper;
 
-  constructor(scope: Construct, api: RestApi, photoBucketArn: string) {
+  constructor(scope: Construct, api: RestApi, policies: Policies) {
     this.scope = scope;
     this.api = api;
-    this.photoBucketArn = photoBucketArn;
+    this.policies = policies;
     this.initialize();
   }
 
@@ -105,7 +106,7 @@ export class AuthorizerWrapper {
       this.scope,
       this.userPool,
       this.userPoolClient,
-      this.photoBucketArn
+      this.policies
     );
   }
 

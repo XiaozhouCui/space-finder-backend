@@ -8,6 +8,7 @@ import { PolicyStatement } from 'aws-cdk-lib/aws-iam'
 import { AuthorizerWrapper } from './auth/AuthorizerWrapper'
 import { Bucket, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { WebAppDeployment } from './WebAppDeployment';
+import { Policies } from './Policies';
 // import { Code, Function as LambdaFunction, Runtime } from 'aws-cdk-lib/aws-lambda';
 
 export class SpaceStack extends Stack {
@@ -16,6 +17,8 @@ export class SpaceStack extends Stack {
   private authorizer: AuthorizerWrapper
   private suffix: string
   private spacesPhotosBucket: Bucket
+  private profilePhotosBucket: Bucket;
+  private policies: Policies;
 
   // private spacesTable = new GenericTable('SpacesTable', 'spaceId', this)
   private spacesTable = new GenericTable(this, {
@@ -54,10 +57,12 @@ export class SpaceStack extends Stack {
     // initialize S3 bucket with suffix from stack ID
     this.initializeSuffix()
     this.initializeSpacesPhotosBucket()
+    this.initializeProfilePhotosBucket();
 
     // AuthorizerWrapper will bind authorizer with ApiGateway, 
     // AuthorizerWrapper also passes bucket arn to Identity Pool and then add to admin role
-    this.authorizer = new AuthorizerWrapper(this, this.api, this.spacesPhotosBucket.bucketArn + '/*')
+    this.policies = new Policies(this.spacesPhotosBucket, this.profilePhotosBucket);
+    this.authorizer = new AuthorizerWrapper(this, this.api, this.policies);
 
     new WebAppDeployment(this, this.suffix)
 
@@ -137,6 +142,24 @@ export class SpaceStack extends Stack {
     });
     new CfnOutput(this, 'spaces-photos-bucket-name', {
       value: this.spacesPhotosBucket.bucketName
+    })
+  }
+
+  private initializeProfilePhotosBucket() {
+    this.profilePhotosBucket = new Bucket(this, 'profile-photos', {
+      bucketName: 'profile-photos-' + this.suffix,
+      cors: [{
+        allowedMethods: [
+            HttpMethods.HEAD,
+            HttpMethods.GET,
+            HttpMethods.PUT
+        ],
+        allowedOrigins: ['*'],
+        allowedHeaders: ['*']
+      }]
+    });
+    new CfnOutput(this, 'profile-photos-bucket-name', {
+      value: this.profilePhotosBucket.bucketName
     })
   }
 }
