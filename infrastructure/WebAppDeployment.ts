@@ -59,6 +59,15 @@ export class WebAppDeployment {
               s3BucketSource: this.deploymentBucket
             }
           }
+        ],
+        // redirect SPA routes back to root '/'
+        errorConfigurations: [
+          {
+            errorCode: 403,
+            responsePagePath: '/index.html',
+            responseCode: 200,
+            errorCachingMinTtl: 10
+          }
         ]
       }
     )

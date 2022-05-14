@@ -215,3 +215,17 @@
 - Copy the _Space-finder.IdentityPoolId_ from terminal after deploy, copy it to replace the `IDENTITY_POOL_ID` in _config.ts_
 - To test it locally, update _auth.test.ts_ and run debug, `getBuckets()` should throw error _accessDenied_
 - Manually add user _joe.cui.2_ to Group _admins_ in AWS console, run debug again, it should return buckets list
+
+## Deploy frontend
+
+- In backend infrastructure folder, add new class `WebAppDeployment.ts`, which will read the *build* folder in frontend
+- In frontend end folder, run `npm run build`
+- In backend, run `cdk deploy`, S3 bucket will be updated together with other services
+- To invalidate CloudFront cache, run `aws cloudfront create-invalidation --distribution-id <dist_id> --paths '/*'`
+
+## Update users in cognito user pool
+
+- Once users are added in user pool, password can be reset by AWS CLI
+```
+aws cognito-idp admin-set-user-password --user-pool-id <userpoolid> --username joe --password <password> --permanent
+```
